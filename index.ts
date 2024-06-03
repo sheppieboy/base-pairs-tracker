@@ -2,7 +2,12 @@ require('dotenv').config();
 
 const RPC_URL: string = `https://api.developer.coinbase.com/rpc/v1/base/${process.env.RPC_API}`;
 
-const UniswapV2Address: string = '0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24';
+let uniswapV2Address: string = '0x8909dc15e40173ff4699343b6eb8132c65e18ec6';
+
+let pairCreationTopic: string =
+  '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9';
+
+let exampleBlock: number = 15320575;
 
 const getLogs = async () => {
   const response = await fetch(RPC_URL, {
@@ -14,7 +19,14 @@ const getLogs = async () => {
       jsonrpc: '2.0',
       id: 1,
       method: 'eth_getLogs',
-      params: [{ fromBlock: '0xdad3c1', toBlock: '0xdad3c2' }],
+      params: [
+        {
+          address: '0x8909dc15e40173ff4699343b6eb8132c65e18ec6',
+          fromBlock: '0xe9c5fe',
+          toBlock: '0xe9c600',
+          topics: [pairCreationTopic],
+        },
+      ],
     }),
   });
 
@@ -30,5 +42,17 @@ const getLogs = async () => {
 
   console.log(responseBody);
 };
+
+function numberToHex(num: number): string {
+  if (!Number.isInteger(num) || num < 0) {
+    throw new Error('Input must be a non-negative integer.');
+  }
+
+  return num.toString(16);
+}
+
+let fromBlock = numberToHex(exampleBlock - 1);
+let toBlock = numberToHex(exampleBlock + 1);
+console.log(fromBlock, toBlock); // Output: "ff"
 
 getLogs();
